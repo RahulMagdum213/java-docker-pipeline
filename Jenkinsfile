@@ -22,9 +22,9 @@ pipeline {
                 script {
                     echo "Logging in to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", 
-                                                      usernameVariable: 'rahul1584', 
-                                                      passwordVariable: '@Docker123')]) {
-                        bat "docker login -u %USERNAME% -p %PASSWORD%"
+                                                      usernameVariable: 'USERNAME', 
+                                                      passwordVariable: 'PASSWORD')]) {
+                        bat """docker login -u %USERNAME% -p %PASSWORD%"""
                     }
                 }
             }
