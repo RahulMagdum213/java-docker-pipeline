@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image..."
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
                 }
             }
         }
@@ -30,9 +30,9 @@ pipeline {
                 script {
                     echo "Logging in to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", 
-                                                      usernameVariable: 'rahul1584', 
-                                                      passwordVariable: '@Docker123')]) {
-                        sh "docker login -u $USERNAME -p $PASSWORD"
+                                                      usernameVariable: 'USERNAME', 
+                                                      passwordVariable: 'PASSWORD')]) {
+                        bat "docker login -u %USERNAME% -p %PASSWORD%"
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to Docker Hub..."
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
                 }
             }
         }
@@ -50,3 +50,10 @@ pipeline {
 
     post {
         success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Check console output."
+        }
+    }
+}
