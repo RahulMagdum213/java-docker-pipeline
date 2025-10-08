@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Pull code from your GitHub repo
-                git 'https://github.com/yourusername/java-docker-pipeline.git'
+                git 'https://github.com/RahulMagdum213/java-docker-pipeline.git'
             }
         }
 
