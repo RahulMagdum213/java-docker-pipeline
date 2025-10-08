@@ -2,25 +2,25 @@ pipeline {
     agent any
 
     environment {
-        // Docker Hub credentials ID (add in Jenkins)
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-login')
-
-        // Your Docker Hub image name
-        IMAGE_NAME = "rahul1584/java-jenkins-demo"
+        // Jenkins credential ID for Docker Hub
+        DOCKERHUB_CREDENTIALS = 'dockerhub-login'
+        IMAGE_NAME = 'rahul1584/java-jenkins-demo'
+        IMAGE_TAG = 'latest'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Pull code from your GitHub repo
-                git 'https://github.com/RahulMagdum213/java-docker-pipeline.git'
+                // Checkout default branch from GitHub
+                git url: 'https://github.com/RahulMagdum213/java-docker-pipeline.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE_NAME .'
+                    echo "Building Docker image..."
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
@@ -28,7 +28,12 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                    echo "Logging in to Docker Hub..."
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", 
+                                                      usernameVariable: 'rahul1584', 
+                                                      passwordVariable: '@Docker123')]) {
+                        sh "docker login -u $USERNAME -p $PASSWORD"
+                    }
                 }
             }
         }
@@ -36,9 +41,12 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 script {
-                    sh 'docker push $IMAGE_NAME'
+                    echo "Pushing Docker image to Docker Hub..."
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
         }
     }
-}
+
+    post {
+        success {
