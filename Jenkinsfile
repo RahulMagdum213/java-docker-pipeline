@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                bat 'git checkout main && git pulls https://github.com/RahulMagdum213/java-docker-pipeline.git'
+                bat 'git checkout main && git pull https://github.com/RahulMagdum213/java-docker-pipeline.git'
             }
         }
 
