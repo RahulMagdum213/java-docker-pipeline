@@ -1,40 +1,43 @@
+https://github.com/RahulMagdum213/java-docker-pipeline.git
 pipeline {
     agent any
 
     environment {
+        // Use your Jenkins Credentials ID
         DOCKERHUB_CREDENTIALS = 'dockerhub-login'
-        IMAGE_NAME = 'rahul1584/java-jenkins-demo'
-        IMAGE_TAG = 'latest'
+        DOCKER_IMAGE = "rahul1584/ise3"
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                bat 'git checkout main && git pulls https://github.com/RahulMagdum213/java-docker-pipeline.git'
+            }
+        }
+
+        stage('Build Java App') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo "Building Docker image..."
-                    bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
-                }
+                bat "docker build -t %DOCKER_IMAGE%:latest ."
             }
         }
 
-        stage('Login to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Logging in to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", 
-                                                      usernameVariable: 'USERNAME', 
-                                                      passwordVariable: 'PASSWORD')]) {
-                        bat """docker login -u %USERNAME% -p %PASSWORD%"""
+                                                      usernameVariable: 'rahul1584', 
+                                                      passwordVariable: '@Docker123')]) {
+                        bat """
+                        echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
+                        docker push %DOCKER_IMAGE%:latest
+                        """
                     }
-                }
-            }
-        }
-
-        stage('Push Image to Docker Hub') {
-            steps {
-                script {
-                    echo "Pushing Docker image to Docker Hub..."
-                    bat "docker push %IMAGE_NAME%:%IMAGE_TAG%"
                 }
             }
         }
@@ -42,10 +45,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully!"
+            echo "Docker Image built and pushed successfully!"
         }
         failure {
-            echo "Pipeline failed. Check console output."
+            echo "Pipeline failed. Check logs."
         }
     }
 }
