@@ -1,4 +1,3 @@
-https://github.com/RahulMagdum213/java-docker-pipeline.git
 pipeline {
     agent any
 
